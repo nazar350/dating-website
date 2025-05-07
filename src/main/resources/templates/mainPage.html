@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dating - Main Page</title>
+    <link rel="stylesheet" th:href="@{/css/mainPage-styles.css}">
+</head>
+<body>
+<header class="header">
+    <div class="logo">💕 Dating</div>
+    <div class="header-buttons">
+        <a th:href="@{/invitations}" class="invitations-link">Invitations</a>
+        <a th:href="@{/myProfile}" class="profile-link">My Profile</a>
+        <form th:action="@{/perform_logout}" method="post" style="display: inline;">
+            <button type="submit" class="logout-btn">Log Out</button>
+        </form>
+    </div>
+</header>
+
+<div class="main-container">
+    <div th:if="${message}" th:text="${message}" class="success-message"></div>
+    <div th:if="${error}" th:text="${error}" class="error-message"></div>
+
+    <div class="users-header">
+        <h1>Find by Interests</h1>
+        <div class="search-container">
+            <form th:action="@{/mainPage}" method="get">
+                <input type="text" id="search-input" name="search" th:value="${search}" placeholder="Search by interests (e.g., Travel, Music)">
+                <button type="submit" id="search-btn">Search</button>
+            </form>
+        </div>
+        <form th:action="@{/mainPage}" method="get">
+            <select class="sort-select" id="sort-select" name="sort" onchange="this.form.submit()">
+                <option value="alphabet-asc" th:selected="${sort == 'alphabet-asc'}">Sort by Alphabet (A to Z)</option>
+                <option value="alphabet-desc" th:selected="${sort == 'alphabet-desc'}">Sort by Alphabet (Z to A)</option>
+                <option value="interests-match" th:selected="${sort == 'interests-match'}">Sort by Matching Interests (Most to Least)</option>
+                <option value="registration-date" th:selected="${sort == 'registration-date'}">Sort by Registration Date (Newest First)</option>
+            </select>
+        </form>
+    </div>
+
+    <div class="users-grid" id="users-grid">
+        <div class="userModel-card" th:each="user : ${users}" th:if="${user.id != session.userId}">
+            <div class="userModel-image"
+                 th:style="${user.photoUrl} != null ? 'background-image: url(' + ${user.photoUrl} + ')' : 'background-image: url(/images/default-profile.jpg)'"></div>
+            <h2 th:text="${user.name} + ' ' + ${user.surname}"></h2>
+            <p th:text="${user.age} + ' years old'"></p>
+            <div class="interests">
+                <span class="interest" th:each="interest : ${user.interestsAsList}" th:text="${interest}"></span>
+            </div>
+            <div class="action-buttons">
+                <a th:href="@{/userProfile(userId=${user.id})}" class="view-profile-btn">View Profile</a>
+                <div th:if="${acceptedUserIds.contains(user.id)}" class="request-sent-btn">Already Connected</div>
+                <div th:if="${!acceptedUserIds.contains(user.id) and sentInvitationReceiverIds.contains(user.id)}" class="request-sent-btn">Request Sent</div>
+                <form th:if="${!acceptedUserIds.contains(user.id) and !sentInvitationReceiverIds.contains(user.id)}" th:action="@{/invitations/send}" method="post">
+                    <input type="hidden" name="senderId" th:value="${session.userId}">
+                    <input type="hidden" name="receiverId" th:value="${user.id}">
+                    <input type="hidden" name="search" th:value="${search}">
+                    <input type="hidden" name="sort" th:value="${sort}">
+                    <button type="submit" class="send-request-btn">Send Request</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
