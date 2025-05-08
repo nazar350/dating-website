@@ -34,6 +34,10 @@ public class MainPageController {
             return "redirect:/login";
         }
 
+        if (search != null && search.length() > 100) {
+            throw new IllegalArgumentException("Search query is too long");
+        }
+
         List<UserDTO> users = userService.getUsersForMainPage(search, sort, userId);
         List<InvitationsDTO> sentInvitations = invitationService.getSentInvitations(userId);
         List<InvitationsDTO> acceptedInvitations = invitationService.getAcceptedInvitations(userId);
