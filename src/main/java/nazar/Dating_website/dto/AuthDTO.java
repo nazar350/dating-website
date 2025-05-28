@@ -4,6 +4,8 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import nazar.Dating_website.CustomValidating.MinimumDate;
+
 import java.time.LocalDate;
 
 @Data
@@ -31,6 +33,7 @@ public class AuthDTO {
 
     @NotNull(message = "Birthday is required")
     @Past(message = "Birthday must be in the past")
+    @MinimumDate
     private LocalDate birthday;
 
     @NotNull(message = "Gender is required")
